@@ -19,3 +19,60 @@ El datalogger puede realizar el control a través de cualquier salida digital co
 4.	Fuente de alimentación: Se requiere incorporar una fuente de alimentación que proporcione un voltaje de 12 voltios para el registrador CR1000. Asegurando que la fuente de alimentación tenga la capacidad de suministrar la corriente necesaria para las funciones estándar de las estaciones INIA y la nueva función encargada de controlar el riego.
 5.	Convertidor de voltaje: Actualmente una estación estándar INIA, funciona con tensiones de 12 volt, esto permite alimentar el registrador, varios sensores y el modem celular encargado de la trasmisión. Pero la válvula seleccionada soporta un voltaje de corriente continua de 9 volt como máximo. Para estos efectos se utilizará el convertidor DC 24V/12V a 9V 3A 27W que regula un voltaje de entrada de 12V a 32V y proporciona una salida de 9V con una corriente de 3A. Tiene una eficiencia de conversión de hasta el 95% y cuenta con protecciones contra inversión de entrada y sobrecarga.
 6.	Sensor de humedad del suelo (opcional): Se puede incorporar un sensor de humedad de suelo que permita activar el sistema de riego automáticamente cuando el suelo esté seco. Como sensor de humedad de suelo para esta aplicación se utilizará El TEROS 10 es un sensor de humedad del suelo fabricado por METER, caracterizado por su robustez y durabilidad. Este sensor opera a una frecuencia de 70 MHz, lo que minimiza los efectos de la salinidad y las texturas del suelo, proporcionando mediciones precisas. Está construido con un cuerpo de epoxi que puede soportar condiciones ambientales adversas, y está diseñado para ser confiable y eficaz en la recopilación de datos por hasta 10 años en una variedad de suelos, desde áridos hasta muy húmedos.
+
+## Ejemplos de codificación.
+
+```basic
+'CR1000X Series Datalogger
+'The datalogger type listed on line 1 determines the default instruction set,
+'compiler, and help files used for a program that uses the .DLD or .CRB program
+'extension. These options can also be set using the Set Datalogger Type dialog box
+'(CRBasic Editor|Tools|Set Datalogger Type).
+
+'Date: 12/04/2024
+'Program author: Ruben E. Ruiz.
+
+'Declare Constants
+'Example: Test basic control valve
+'CONST PI = 3.141592654
+
+'Declare Public Variables
+'Example:
+Public PTemp, Batt_volt
+Public onIrrigation As Boolean
+
+'Declare Private Variables
+'Example:
+'Dim Counter
+
+'Define Data Tables
+DataTable (Test,1,-1) 'Set table size to # of records, or -1 to autoallocate.
+	DataInterval (0,15,Sec,10)
+	Minimum (1,batt_volt,FP2,False,False)
+	Sample (1,PTemp,FP2)
+EndTable
+
+'Define Subroutines
+'Sub
+	'EnterSub instructions here
+'EndSub
+
+'Main Program
+BeginProg
+  onIrrigation = False
+	Scan (5,Sec,0,0)
+		PanelTemp (PTemp,15000)
+		Battery (Batt_volt)
+		'Enter other measurement instructions
+		'Call Output Tables
+		'Example:
+		CallTable Test
+	
+    'Control valve
+		PortSet(C1,onIrrigation)
+		'On/off Irrigation
+    onIrrigation = NOT onIrrigation
+    
+	NextScan
+EndProg
+```
